@@ -4,6 +4,26 @@ import asyncio
 
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 
+ROOT_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
+with open(
+    os.path.join(ROOT_DIR, "config.json"),
+    "r",
+    encoding="utf-8"
+) as f:
+    config = json.load(f)
+
+MODEL_PATH = os.path.abspath(
+    os.path.join(
+        ROOT_DIR,
+        config["model_dir"]
+    )
+)
+
 from transformers.utils import logging
 logging.set_verbosity_error()
 
@@ -19,11 +39,23 @@ from mcp.client.stdio import (
     StdioServerParameters,
 )
 
-MODEL_PATH = "./model"
-
 server_params = StdioServerParameters(
-    command=r"F:\Project A\MCP Practice\.venv\Scripts\python.exe",
-    args=[r"F:\Project A\MCP Practice\server.py"]
+    command=os.path.join(
+        os.path.dirname(
+            os.path.abspath(__file__)
+        ),
+        ".venv",
+        "Scripts",
+        "python.exe"
+    ),
+    args=[
+        os.path.join(
+            os.path.dirname(
+                os.path.abspath(__file__)
+            ),
+            "server.py"
+        )
+    ]
 )
 
 

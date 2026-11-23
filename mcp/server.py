@@ -1,8 +1,35 @@
+import os
 import json
 import subprocess
 
 from mcp.server import MCPServer
 
+ROOT_DIR = os.path.dirname(
+    os.path.dirname(
+        os.path.abspath(__file__)
+    )
+)
+
+with open(
+    os.path.join(ROOT_DIR, "config.json"),
+    "r",
+    encoding="utf-8"
+) as f:
+    config = json.load(f)
+
+extractor_dir = os.path.abspath(
+    os.path.join(
+        ROOT_DIR,
+        config["extractor_dir"]
+    )
+)
+
+extractor_python = os.path.abspath(
+    os.path.join(
+        ROOT_DIR,
+        config["extractor_python"]
+    )
+)
 
 server = MCPServer(
     name="Project A Malware Server",
@@ -24,14 +51,6 @@ def extract_features(
     """
 
     try:
-
-        extractor_dir = (
-            r"F:\Project A\Model\file_sign_extractor"
-        )
-
-        extractor_python = (
-            r"F:\Project A\Model\file_sign_extractor\.venv\Scripts\python.exe"
-        )
 
         result = subprocess.run(
             [

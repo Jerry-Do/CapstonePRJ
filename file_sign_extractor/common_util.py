@@ -63,6 +63,31 @@ def CapaExtract(file):
                     curr_t[curr_section].append(section_content)
     #if os.path.exists("test.txt"):
         #os.remove("test.txt")
+    
+    for category in package:
+
+        remove_keys = []
+
+        for key, values in package[category].items():
+
+            if not values:
+                remove_keys.append(key)
+                continue
+
+            clean_values = [
+                v.strip()
+                for v in values
+                if v.strip()
+            ]
+
+            if not clean_values:
+                remove_keys.append(key)
+            else:
+                package[category][key] = clean_values
+
+        for key in remove_keys:
+            del package[category][key]
+
     return package
 
 def ConvertIntToHex(value):

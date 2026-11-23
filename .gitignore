@@ -14,6 +14,8 @@ __pycache__/
 # Model files
 mcp/model/
 
+# Generated files
+file_sign_extractor/test.txt
 
 # OS files
 .DS_Store
