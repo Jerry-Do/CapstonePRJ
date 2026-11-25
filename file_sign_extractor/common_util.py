@@ -4,9 +4,30 @@ import struct
 import json
 import subprocess
 import os
+import re
 from scipy.stats import entropy
+PATTERNS = {
+    'url':       r'https?://[^\s"\'<>]{4,}',
+    'ipv4':      r'\b(?:(?:25[0-5]|2[0-4]\d|1?\d?\d)\.){3}(?:25[0-5]|2[0-4]\d|1?\d?\d)\b',
+    'domain':    r'\b(?:[a-z0-9-]{1,63}\.)+(?:com|net|org|ru|cn|info|xyz|top|io|biz|onion)\b',
+    'email':     r'[\w.+-]+@[\w-]+\.[\w.-]+',
+    'win_path':  r'(?<![A-Za-z0-9])[A-Za-z]:\\(?:[\w .$()-]+\\)*[\w .$()-]{2,}',
+    'unc_path':  r'\\\\[\w.$-]+\\',
+    'registry':  r'(?:HKEY_[A-Z_]+|HK(?:LM|CU|CR))\\',
+    'run_key':   r'(?i)CurrentVersion\\Run',
+    'pdb':       r'(?i)\.pdb\b',
+    'cmdline':   r'(?i)\b(?:cmd(?:\.exe)?\s*/c|powershell|rundll32|regsvr32|schtasks|wscript|mshta)\b',
+    'api_inject':r'\b(?:VirtualAlloc(?:Ex)?|WriteProcessMemory|CreateRemoteThread|NtUnmapViewOfSection|SetWindowsHookEx[AW]?)\b',
+    'api_net':   r'\b(?:InternetOpen[AW]?|URLDownloadToFile[AW]?|WinHttp\w+|socket|connect|recv|send)\b',
+    'api_antidbg':r'\b(?:IsDebuggerPresent|CheckRemoteDebuggerPresent|NtQueryInformationProcess)\b',
+    'base64':    r'^(?:[A-Za-z0-9+/]{4}){6,}(?:[A-Za-z0-9+/]{2}==|[A-Za-z0-9+/]{3}=)?$',
+    'guid':      r'\{[0-9A-Fa-f]{8}-(?:[0-9A-Fa-f]{4}-){3}[0-9A-Fa-f]{12}\}',
+    'hash_hex':  r'\b(?:[a-f0-9]{32}|[a-f0-9]{40}|[a-f0-9]{64})\b',
+    'btc_onion': r'\b(?:bc1|[13])[a-zA-HJ-NP-Z0-9]{25,39}\b|\.onion\b',
+}
 
-
+COMPILED = {k: re.compile(v) for k, v in PATTERNS.items()}
+max_length = 150
 def CapaExtract(file):
     package = {}
     package["ATT&CK Tactic"] = {}
@@ -115,3 +136,20 @@ def GetFileSize(file):
 def SaveToJSON(package):
     with open("result.json","w") as file:
         json.dump(package, file, indent=4)
+
+
+def ExtractStrings(file):
+    return_strings = []
+    cmd = ".\\floss.exe -j " + file
+    with open("string_result.json", "w") as f:
+        subprocess.run(cmd, stdout=f, text=True)
+        
+    with open("string_result.json" ,"r", encoding="utf-8") as file:
+        data = json.load(file)
+        static_strings =  data["strings"]["static_strings"]
+        for entry in static_strings:
+                string = entry["string"]
+                for pattern in COMPILED:
+                    if re.search(COMPILED[pattern], string) and len(string) < max_length:
+                            return_strings.append(string)
+    return return_strings

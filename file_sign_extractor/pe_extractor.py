@@ -1,8 +1,7 @@
 import lief
 import common_util
-import pefile
 from datetime import datetime,timezone
-
+from concurrent.futures import ThreadPoolExecutor
 
 def ExtractOptionalHeaderFeat(parsed_file):
     op_header : lief.PE.OptionalHeader = parsed_file.optional_header
@@ -10,7 +9,7 @@ def ExtractOptionalHeaderFeat(parsed_file):
     the_packet["Address Of Entry"] = common_util.ConvertIntToHex(op_header.addressof_entrypoint)
     the_packet["Size of Code"] = op_header.sizeof_code
     the_packet["Size of Image"] = op_header.sizeof_image
-    #TODO:
+    
     the_packet["Size Of Headers"] = op_header.sizeof_headers
     the_packet["Size of unintialized data"] = op_header.sizeof_uninitialized_data
     the_packet["Size of intialized data"] = op_header.sizeof_initialized_data
@@ -20,13 +19,7 @@ def ExtractOptionalHeaderFeat(parsed_file):
     the_packet["Size of stack reserve"] = op_header.sizeof_stack_reserve
     the_packet["Size of stack commit"] = op_header.sizeof_stack_commit
     the_packet["Size of heap reserve"] = op_header.sizeof_heap_reserve
-    #Extract size of headers
-    #size of un and initalized data
-    #base of code
-    #image base
-    #number of rva and sizes
-    #size of stack reserve and commit
-    #size of heap commit
+ 
 
     return the_packet
     
@@ -50,8 +43,11 @@ def ExtractCOFFHeader(parsed_file):
 
 def StartExtractingPE(file):
     parsed_file = lief.parse(file)
-
     big_one = {}
+    #Added multi threading for extracting strings and capa to increase speed
+    ex = ThreadPoolExecutor(max_workers=2)
+    f1 = ex.submit(common_util.ExtractStrings, file)
+    f2 = ex.submit(common_util.CapaExtract, file)
 
     big_one["Size"] = common_util.GetFileSize(file)
     big_one["Hashses"] = common_util.HashCalc(file)
@@ -60,11 +56,12 @@ def StartExtractingPE(file):
     big_one["Optional Header"] = ExtractOptionalHeaderFeat(parsed_file)
     big_one["Libraries and API"] = ExtractLibraries(parsed_file)
 
-    capa_pack = common_util.CapaExtract(file)
-
+    big_one["Strings"] = f1.result()
+    
+    capa_pack = f2.result()
     big_one["CAPA"] = capa_pack["CAPA"]
     big_one["MBC"] = capa_pack["MBC"]
     big_one["ATT&CK"] = capa_pack["ATT&CK Tactic"]
-
+    ex.shutdown() 
     return big_one
     
