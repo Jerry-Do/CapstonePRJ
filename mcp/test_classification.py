@@ -2,6 +2,8 @@ import os
 import json
 import asyncio
 
+from huggingface_hub import snapshot_download
+
 os.environ["TRANSFORMERS_VERBOSITY"] = "error"
 
 ROOT_DIR = os.path.dirname(
@@ -23,6 +25,34 @@ MODEL_PATH = os.path.abspath(
         config["model_dir"]
     )
 )
+
+MODEL_REPO = (
+    "fauslimbus/unsloth_Qwen3.5-2B_Berbew_malware2.0.0"
+)
+
+config_file = os.path.join(
+    MODEL_PATH,
+    "config.json"
+)
+
+if not os.path.exists(config_file):
+
+    print(
+        "\nModel not found locally."
+    )
+
+    print(
+        "Downloading model from Hugging Face..."
+    )
+
+    snapshot_download(
+        repo_id=MODEL_REPO,
+        local_dir=MODEL_PATH
+    )
+
+    print(
+        "Download complete."
+    )
 
 from transformers.utils import logging
 logging.set_verbosity_error()

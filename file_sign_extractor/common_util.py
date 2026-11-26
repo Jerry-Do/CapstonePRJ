@@ -139,13 +139,32 @@ def SaveToJSON(package):
 
 
 def ExtractStrings(file):
+
     return_strings = []
-    cmd = ".\\floss.exe -j " + file
-    with open("string_result.json", "w") as f:
-        subprocess.run(cmd, stdout=f, text=True)
-        
-    with open("string_result.json" ,"r", encoding="utf-8") as file:
-        data = json.load(file)
+
+    result = subprocess.run(
+        [
+            os.path.join(
+                os.path.dirname(__file__),
+                "floss.exe"
+            ),
+            "-j",
+            file
+        ],
+        capture_output=True,
+        text=True
+    )
+
+    try:
+
+        data = json.loads(
+            result.stdout
+        )
+
+    except Exception:
+
+        return []
+
         static_strings =  data["strings"]["static_strings"]
         for entry in static_strings:
                 string = entry["string"]
