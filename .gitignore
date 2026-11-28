@@ -15,7 +15,7 @@ __pycache__/
 mcp/model/
 
 # Generated files
-file_sign_extractor/test.txt
+file_feature_extractor/test.txt
 mcp/analysis_report.txt
 
 # OS files

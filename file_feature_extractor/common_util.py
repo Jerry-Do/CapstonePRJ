@@ -165,10 +165,10 @@ def ExtractStrings(file):
 
         return []
 
-        static_strings =  data["strings"]["static_strings"]
-        for entry in static_strings:
-                string = entry["string"]
-                for pattern in COMPILED:
-                    if re.search(COMPILED[pattern], string) and len(string) < max_length:
-                            return_strings.append(string)
+    static_strings =  data["strings"]["static_strings"]
+    for entry in static_strings:
+            string = entry["string"]
+            for pattern in COMPILED:
+                if re.search(COMPILED[pattern], string) and len(string) < max_length:
+                        return_strings.append(string)
     return return_strings

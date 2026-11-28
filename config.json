@@ -1,5 +1,5 @@
 {
     "model_dir": "./mcp/model",
-    "extractor_dir": "./file_sign_extractor",
-    "extractor_python": "./file_sign_extractor/.venv/Scripts/python.exe"
+    "extractor_dir": "./file_feature_extractor",
+    "extractor_python": "./file_feature_extractor/.venv/Scripts/python.exe"
 }

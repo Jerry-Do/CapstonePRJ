@@ -21,40 +21,26 @@ if __name__ == "__main__":
 
     args = parser.parse_args()
 
-    ##try:
-
-        ##result = StartExtractingPE(
-            ##args.file
-        #)
-
-        #print(
-            #json.dumps(
-                #result
-            #)
-        #)
-
-    #except Exception as ex:
-
-        #print(
-            #json.dumps(
-                #{
-                    #"error": str(ex)
-                #}
-            #)
-        #)
-
     file = lief.parse(args.file)
     magic = ""
+
     try:
         magic = struct.pack("<I",file.dos_header.magic).hex().strip("00")
     except:
-        print("Not PE file")
+        print(json.dumps({"error":"Not PE file"}))
+        exit()
+
     try:
-        magic = struct.pack("<I",file.header.magic).hex().strip("00")
+        elf_magic = struct.pack("<I",file.header.magic).hex().strip("00")
     except:
-        print("Not ELF file")
+        elf_magic = ""
+
     match magic:
         case "4d5a":
-            result = StartExtractingPE(args.file)
+            try:
+                result = StartExtractingPE(args.file)
+                print(json.dumps(result))
+            except Exception as ex:
+                print(json.dumps({"error":str(ex)}))
         case _:
-            print("Not supported file type")
+            print(json.dumps({"error":"Not supported file type"}))
