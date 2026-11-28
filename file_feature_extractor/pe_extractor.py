@@ -50,7 +50,6 @@ def StartExtractingPE(file):
     f2 = ex.submit(common_util.CapaExtract, file)
 
     big_one["Size"] = common_util.GetFileSize(file)
-    big_one["Hashses"] = common_util.HashCalc(file)
     big_one["Entropy"] = common_util.EntropyCalc(file)
     big_one["COFF Header"] = ExtractCOFFHeader(parsed_file)
     big_one["Optional Header"] = ExtractOptionalHeaderFeat(parsed_file)
