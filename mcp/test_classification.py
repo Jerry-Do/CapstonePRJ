@@ -236,6 +236,51 @@ async def main():
 
             print(response)
 
+            try:
+
+                report_data = json.loads(response)
+
+            except Exception:
+
+                report_data = {
+                    "raw_response": response
+                }
+            
+            report_text = {
+                "sample": file_path,
+                "verdict": report_data.get(
+                    "verdict",
+                    "unknown"
+                ),
+                "evidence": report_data.get(
+                    "evidence",
+                    []
+                ),
+                "explanation": report_data.get(
+                    "explanation",
+                    ""
+                )
+            }
+
+            save_result = await session.call_tool(
+                "save_report",
+                {
+                    "report": report_text,
+                    "output_file": "analysis_report.txt"
+                }
+            )
+
+            save_result = json.loads(
+                save_result.content[0].text
+            )
+
+            print(
+                "\n===== REPORT SAVED =====\n"
+            )
+
+            print(
+                f"\nReport saved as: {save_result['output_file']}"
+            )
 
 if __name__ == "__main__":
     asyncio.run(main())

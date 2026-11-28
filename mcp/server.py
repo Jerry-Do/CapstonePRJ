@@ -150,7 +150,7 @@ def save_report(
     output_file: str
 ):
     """
-    Save analysis report as JSON.
+    Save analysis report as a readable text report.
     """
 
     try:
@@ -161,11 +161,61 @@ def save_report(
             encoding="utf-8"
         ) as f:
 
-            json.dump(
-                report,
-                f,
-                indent=4
+            f.write(
+                "=================================\n"
             )
+
+            f.write(
+                " MALWARE ANALYSIS REPORT\n"
+            )
+
+            f.write(
+                "=================================\n\n"
+            )
+
+            f.write(
+                f"Sample: {report.get('sample', 'Unknown')}\n\n"
+            )
+
+            f.write(
+                f"Verdict: {report.get('verdict', 'Unknown')}\n\n"
+            )
+
+            f.write(
+                "Evidence:\n"
+            )
+
+            evidence = report.get(
+                "evidence",
+                []
+            )
+
+            if evidence:
+
+                for item in evidence:
+
+                    f.write(
+                        f"- {item}\n"
+                    )
+
+            else:
+
+                f.write(
+                    "- No evidence provided\n"
+                )
+
+            f.write(
+                "\nExplanation:\n"
+            )
+
+            f.write(
+                report.get(
+                    "explanation",
+                    "No explanation provided."
+                )
+            )
+
+            f.write("\n")
 
         return {
             "saved": True,

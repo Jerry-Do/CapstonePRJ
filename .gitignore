@@ -16,6 +16,7 @@ mcp/model/
 
 # Generated files
 file_sign_extractor/test.txt
+mcp/analysis_report.txt
 
 # OS files
 .DS_Store
